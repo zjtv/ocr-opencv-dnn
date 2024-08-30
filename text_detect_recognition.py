@@ -32,11 +32,11 @@ parser = argparse.ArgumentParser(
                 "EAST: An Efficient and Accurate Scene Text Detector (https://arxiv.org/abs/1704.03155v2)"
                 "The OCR model can be obtained from converting the pretrained CRNN model to .onnx format from the github repository https://github.com/meijieru/crnn.pytorch"
                 "Or you can download trained OCR model directly from https://drive.google.com/drive/folders/1cTbQ3nuZG-EKWak6emD_s8_hHXWz7lAr?usp=sharing")
-parser.add_argument('--input',default='sign.jpg',
+parser.add_argument('--input',default='./sign.jpg',
                     help='Path to input image')
-parser.add_argument('--model', default='frozen_east_text_detection.pb',
+parser.add_argument('--model', default='./frozen_east_text_detection.pb',
                     help='Path to a binary .pb file contains trained detector network.')
-parser.add_argument('--ocr', default="CRNN_VGG_BiLSTM_CTC.onnx",
+parser.add_argument('--ocr', default="./CRNN_VGG_BiLSTM_CTC.onnx",
                     help="Path to a binary .pb or .onnx file contains trained recognition network", )
 parser.add_argument('--width', type=int, default=320,
                     help='Preprocess input image by resizing to a specific width. It should be multiple by 32.')
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     indices = cv.dnn.NMSBoxesRotated(boxes, confidences, confThreshold, nmsThreshold)
     for i in indices:
         # get 4 corners of the rotated rect
-        vertices = cv.boxPoints(boxes[i[0]])
+        vertices = cv.boxPoints(boxes[i])
         # scale the bounding box coordinates based on the respective ratios
         for j in range(4):
             vertices[j][0] *= rW
@@ -207,13 +207,15 @@ if __name__ == "__main__":
 
             # decode the result into text
             wordRecognized = decodeText(result)
+            # cv.putText(frame, wordRecognized, (int(vertices[1][0]), int(vertices[1][1])), cv.FONT_HERSHEY_SIMPLEX,
+            #               0.5, (255, 0, 0))
             cv.putText(frame, wordRecognized, (int(vertices[1][0]), int(vertices[1][1])), cv.FONT_HERSHEY_SIMPLEX,
                        1, (0, 0, 255), thickness=1)
 
         for j in range(4):
-            p1 = (vertices[j][0], vertices[j][1])
-            p2 = (vertices[(j + 1) % 4][0], vertices[(j + 1) % 4][1])
-            cv.line(frame, p1, p2, (0, 255, 0), 1)
+          p1 = (int(vertices[j][0]), int(vertices[j][1]))
+          p2 = (int(vertices[(j + 1) % 4][0]), int(vertices[(j + 1) % 4][1]))
+          cv.line(frame, p1, p2, (0, 255, 0), 1)
 
     # Put efficiency information
     label = 'Inference time: %.2f ms' % (tickmeter.getTimeMilli())
