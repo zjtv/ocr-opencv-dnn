@@ -1,4 +1,5 @@
 '''
+    ref: https://github.com/opencv/opencv/blob/master/samples/dnn/text_detection.py
     Text detection model: https://github.com/argman/EAST
     Download link: https://www.dropbox.com/s/r2ingd0l3zt8hxs/frozen_east_text_detection.tar.gz?dl=1
 
